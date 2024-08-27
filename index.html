@@ -40,8 +40,7 @@
 
         detectPulse();
       } catch (error) {
-        statusElement.textContent = 'Error accessing microphone.';
-        console.error('Microphone access error:', error);
+        statusElement.textContent = 'Unable to access the microphone. Please check your permissions.';
       }
     }
 
