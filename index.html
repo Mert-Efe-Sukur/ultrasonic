@@ -35,7 +35,8 @@
         let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         microphone = audioContext.createMediaStreamSource(stream);
         analyser = audioContext.createAnalyser();
-        analyser.fftSize = 2048;
+        analyser.fftSize = 2048; // Size of the FFT
+        analyser.smoothingTimeConstant = 0.3; // Smoothing for better frequency detection
         microphone.connect(analyser);
 
         detectPulse();
@@ -51,10 +52,28 @@
       function analyze() {
         analyser.getByteFrequencyData(dataArray);
 
-        // Pulse detection based on amplitude threshold
-        let max = Math.max(...dataArray);
-        if (max > 180) { // Adjusted threshold value
-          statusElement.textContent = 'Pulse Detected!';
+        // Use a higher frequency range to focus on ultrasonic detection
+        let minFrequency = 16000; // Min frequency to check (16 kHz range)
+        let maxFrequency = 20000; // Max frequency to check (20 kHz range)
+        let detected = false;
+
+        // Calculate frequency bin sizes
+        let frequencyBinCount = analyser.frequencyBinCount;
+        let sampleRate = audioContext.sampleRate;
+        let binSize = sampleRate / analyser.fftSize;
+
+        for (let i = 0; i < frequencyBinCount; i++) {
+          let frequency = i * binSize;
+          if (frequency >= minFrequency && frequency <= maxFrequency) {
+            if (dataArray[i] > 180) { // Amplitude threshold for detecting pulses
+              detected = true;
+              break;
+            }
+          }
+        }
+
+        if (detected) {
+          statusElement.textContent = 'Ultrasonic Pulse Detected!';
         } else {
           statusElement.textContent = 'Waiting for pulses...';
         }
