@@ -52,9 +52,9 @@
       function analyze() {
         analyser.getByteFrequencyData(dataArray);
 
-        // Use a higher frequency range to focus on ultrasonic detection
-        let minFrequency = 16000; // Min frequency to check (16 kHz range)
-        let maxFrequency = 20000; // Max frequency to check (20 kHz range)
+        // Use a frequency range to focus on detecting the 20 kHz pulse
+        let minFrequency = 18000; // Min frequency to check (18 kHz range)
+        let maxFrequency = 22000; // Max frequency to check (22 kHz range)
         let detected = false;
 
         // Calculate frequency bin sizes
