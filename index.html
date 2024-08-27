@@ -52,7 +52,7 @@
       function analyze() {
         analyser.getByteFrequencyData(dataArray);
 
-        // Use a frequency range to focus on detecting the 20 kHz pulse
+        // Use a frequency range to focus on detecting the 20 kHz tone
         let minFrequency = 18000; // Min frequency to check (18 kHz range)
         let maxFrequency = 22000; // Max frequency to check (22 kHz range)
         let detected = false;
@@ -65,7 +65,7 @@
         for (let i = 0; i < frequencyBinCount; i++) {
           let frequency = i * binSize;
           if (frequency >= minFrequency && frequency <= maxFrequency) {
-            if (dataArray[i] > 180) { // Amplitude threshold for detecting pulses
+            if (dataArray[i] > 100) { // Amplitude threshold for detecting pulses
               detected = true;
               break;
             }
