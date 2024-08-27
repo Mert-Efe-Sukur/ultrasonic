@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ultrasonic Pulse Detector</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+    #status {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div id="status">Initializing...</div>
+
+  <script>
+    let statusElement = document.getElementById('status');
+    let audioContext, analyser, microphone;
+
+    async function setupAudio() {
+      try {
+        // Initialize audio context and request microphone access
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        microphone = audioContext.createMediaStreamSource(stream);
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+        microphone.connect(analyser);
+
+        detectPulse();
+      } catch (error) {
+        statusElement.textContent = 'Error accessing microphone.';
+        console.error('Microphone access error:', error);
+      }
+    }
+
+    function detectPulse() {
+      let bufferLength = analyser.frequencyBinCount;
+      let dataArray = new Uint8Array(bufferLength);
+
+      function analyze() {
+        analyser.getByteFrequencyData(dataArray);
+
+        // Pulse detection based on amplitude threshold
+        let max = Math.max(...dataArray);
+        if (max > 180) { // Adjusted threshold value
+          statusElement.textContent = 'Pulse Detected!';
+        } else {
+          statusElement.textContent = 'Waiting for pulses...';
+        }
+
+        requestAnimationFrame(analyze);
+      }
+
+      analyze();
+    }
+
+    setupAudio();
+  </script>
+</body>
+</html>
